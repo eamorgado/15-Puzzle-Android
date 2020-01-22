@@ -146,8 +146,10 @@ public class MainActivity extends AppCompatActivity {
 
 
     public static void swap(Context context, int choice, int to_swap){
-        int target = Integer.parseInt(buttons.get(choice).getText().toString());
-        int goal = Integer.parseInt(buttons.get(to_swap).getText().toString());
+        int target = buttons.get(choice).getId();
+        int goal = buttons.get(to_swap).getId();
+
+        Log.i(TAG,"swap() going to swap "+target+" and "+goal);
 
         //find target/goal row and col
         int tr, tc, gr,gc;
@@ -166,6 +168,8 @@ public class MainActivity extends AppCompatActivity {
 
         buttons.get(choice).setText(""+goal);
         buttons.get(to_swap).setText(""+target);
+        PuzzleLogic logic = new PuzzleLogic(BOARD);
+        Log.i(TAG, "swap() - Board: " + logic);
         displayBoard(context);
     }
     public static void moveTiles(Context context, String direction, int tile_id){
@@ -175,26 +179,32 @@ public class MainActivity extends AppCompatActivity {
                 {0,4,8,12},
                 {3,7,11,15}
         };
+
         List top = Arrays.asList(cond[0]);
         List bottom = Arrays.asList(cond[1]);
         List left = Arrays.asList(cond[2]);
         List right = Arrays.asList(cond[3]);
 
-        boolean c0 = !buttons.get(tile_id).getText().toString().equals("");
+        //Log.i(TAG, "moveTiles() direction: "+ direction + " tile id: " + tile_id + "\n top = "+top+"\nbottom = "+bottom+"\nleft = "+left+"\nright = "+right);
+
+        boolean c0 = buttons.get(tile_id).getText().toString().equals("");
         boolean c1 = top.contains(tile_id) && direction.equals(UP);
         boolean c2 = bottom.contains(tile_id) && direction.equals(DOWN);
         boolean c3 = left.contains(tile_id) && direction.equals(LEFT);
         boolean c4 = right.contains(tile_id) && direction.equals(RIGHT);
 
-        if(c0) Toast.makeText(context,"Invalid Piece", Toast.LENGTH_SHORT).show();
+        Log.i(TAG, "moveTiles(): c0= "+c0+" | c1= "+c1+" | c2= "+c2+" | c3= "+c3+" | c4= "+c4);
+
+        if(!c0) Toast.makeText(context,"Invalid Piece", Toast.LENGTH_SHORT).show();
         else if(c1 || c2 || c3 || c4)
             Toast.makeText(context,"Invalid Move", Toast.LENGTH_SHORT).show();
         else{
+            Toast.makeText(context,"Moving ", Toast.LENGTH_SHORT).show();
             int v = 0;
             v = direction.equals(LEFT) ? -1 : direction.equals(RIGHT) ? 1 : 0;
             int goal = direction.equals(DOWN) ? tile_id + MROW
                     : direction.equals(UP) ? tile_id - MROW : tile_id + v;
-
+            Log.i(TAG,"moveTiles(): swap("+tile_id+","+goal+")");
             swap(context,tile_id,goal);
         }
     }
